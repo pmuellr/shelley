@@ -1,14 +1,6 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
-shelley = require 'shelley'
-
-#-------------------------------------------------------------------------------
-module.exports = class AboutShell extends shelley.ShellProvider
-
-    #---------------------------------------------------------------------------
-    initialize: (options) ->
-        super
-        
+include ../Makefile
 
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller

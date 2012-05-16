@@ -1,14 +1,16 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
-_  = require 'underscore'
+tmp
+node_modules
+vendor
 
-shelley = exports
-
-Shell = require './Shell'
-
-#-------------------------------------------------------------------------------
-shelley.createShell = (options) ->
-    shell = new Shell options
+.gitignore
+.wr
+backup
+bin-src
+lib-src
+Makefile
+samples
 
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller

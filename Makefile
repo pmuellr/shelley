@@ -11,11 +11,25 @@ clean:
 	@rm -rf tmp
 
 #-------------------------------------------------------------------------------
-build: tmp build-shelley build-samples
+build: tmp package.json build-shelley build-bin build-samples
+
+#-------------------------------------------------------------------------------
+package.json: package.cson
+	@echo "-> building package.json"
+
+	@echo building package.json
+	@-rm -rf tmp/*
+	@node_modules/.bin/coffee --compile --bare --output tmp package.cson
+	@echo "function packageJSON(x) { console.log(JSON.stringify(x,null,4))}" > tmp/tmp.js
+	@echo "packageJSON" >> tmp/tmp.js
+	@cat  tmp/package.js >> tmp/tmp.js
+	@node tmp/tmp.js > package.json
+
+	@echo " "
 
 #-------------------------------------------------------------------------------
 build-shelley:
-	@echo building lib/shelley.js directory
+	@echo "-> building lib/shelley.js"
 
     # erase the ./lib directory
 	-@rm -rf lib/*
@@ -23,8 +37,7 @@ build-shelley:
     # pre-compile just to get syntax errors, since browserify doesn't
 	@-rm -rf tmp/*
 
-	@node_modules/.bin/coffee -c -o tmp \
-	    lib-src/*.coffee
+	@node_modules/.bin/coffee --compile --output tmp lib-src/*.coffee
 
     # copy our pesto modules over for browserify
 	@rm -rf tmp/*
@@ -38,37 +51,30 @@ build-shelley:
 	@cp node_modules/underscore/underscore.js tmp
 
     # run browserify
-	@echo "   running browserify"
+	@echo "running browserify"
 	@node_modules/.bin/browserify tmp/index.js \
-	    --outfile lib/shelley.js \
-	    --debug --verbose
+        --alias 'shelley:/shelley' \
+	    --debug --verbose \
+	    --outfile lib/shelley.js
 
 	@touch tmp/build-done.txt
 
-#-------------------------------------------------------------------------------
-build-samples: build-sample-about
+	@echo " "
 
 #-------------------------------------------------------------------------------
-build-sample-about:
+build-bin:
+	@echo "-> building bin"
 
-    # pre-compile just to get syntax errors, since browserify doesn't
-	@-rm -rf tmp/*
+	@rm -rf bin/*
+	@cp bin-src/shelley bin
+	@node_modules/.bin/coffee --bare --compile --output bin bin-src/*.coffee
 
-	@node_modules/.bin/coffee -c -o tmp \
-	    samples/about/*.coffee
+	@echo " "
 
-    # run browserify
-	@echo "   running browserify"
-	@node_modules/.bin/browserify \
-	    --debug --verbose \
-	    --prelude false \
-	    --ignore backbone \
-	    --ignore underscore \
-	    --ignore shelley \
-	    --ignore '/shelley' \
-	    --alias 'shelley:/shelley' \
-	    --outfile samples/about/modules.js \
-	              samples/about/index.coffee
+
+#-------------------------------------------------------------------------------
+build-samples:
+	@cd samples/basic; make
 
 #-------------------------------------------------------------------------------
 tmp:
@@ -76,7 +82,6 @@ tmp:
 
 #-------------------------------------------------------------------------------
 test: build
-	@echo test TBD
 
 #-------------------------------------------------------------------------------
 vendor:

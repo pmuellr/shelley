@@ -6,9 +6,10 @@
 make test
 
 lib-src
+bin-src
 samples
 
-package.json
+package.cson
 Makefile
 
 #-------------------------------------------------------------------------------

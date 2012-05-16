@@ -1,13 +1,12 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
-Backbone = require 'backbone'
+build:
 
-#-------------------------------------------------------------------------------
+	@echo "-> building `pwd`"
 
-module.exports = class ShellProvider extends Backbone.Model
-
-    #---------------------------------------------------------------------------
-    initialize: (options) ->
+	@../../node_modules/.bin/coffee --compile *.coffee
+	    
+	@echo " " 
 
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller
