@@ -14,6 +14,7 @@
     var content, shell;
     content = $("<div>");
     content.html("<p>opened at: " + (Date()));
+    content.addClass("green");
     shell = shelley.createShell({
       title: "closeable shell",
       element: content
@@ -25,6 +26,7 @@
     var content, shell;
     content = $("<div>");
     content.html("<p>opened at: " + (Date()));
+    content.addClass("red");
     shell = shelley.createShell({
       title: "uncloseable shell",
       closeable: false,

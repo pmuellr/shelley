@@ -12,6 +12,7 @@ main = ->
 openCloseableShell = ->
     content = $("<div>")
     content.html "<p>opened at: #{Date()}"
+    content.addClass("green")
     
     shell = shelley.createShell 
         title:     "closeable shell"
@@ -23,6 +24,7 @@ openCloseableShell = ->
 openUncloseableShell = ->
     content = $("<div>")
     content.html "<p>opened at: #{Date()}"
+    content.addClass("red")
     
     shell = shelley.createShell 
         title:     "uncloseable shell"

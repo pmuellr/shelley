@@ -5,12 +5,15 @@ Backbone = require 'backbone'
 
 shelley  = require 'shelley'
 
-#-------------------------------------------------------------------------------
-
+#@ `class Shell`
+#@ =============================================================================
+#@
 module.exports = class Shell
 
-    #---------------------------------------------------------------------------
-    constructor: (options, controllerClass) ->
+    #@ `constructor(options)`
+    #@ -------------------------------------------------------------------------
+    #@
+    constructor: (options) ->
         options = _.defaults options, 
             title:     "<???>"
             closeable: true
@@ -23,8 +26,7 @@ module.exports = class Shell
         @_modal = options.modal
         
         element = options.element
-        
-        title = options.title
+        title   = options.title
 
         @$element = $(element || "<div>")
         @element = @$element[0]
@@ -34,7 +36,7 @@ module.exports = class Shell
             closeOnEscape: false
             title:         title
             modal:         @_modal
-        
+
         @_$shell = @$element.dialog("widget")
         
         return if @_modal
@@ -55,22 +57,30 @@ module.exports = class Shell
             height: h
             position: [x,y]
             
-    #---------------------------------------------------------------------------
+    #@ `title(value)`
+    #@ -------------------------------------------------------------------------
+    #@
     title: (value) ->
         if value
             @$element.dialog "option", "title", value
             
         @$element.dialog "option", "title"
 
-    #---------------------------------------------------------------------------
+    #@ `open()`
+    #@ -------------------------------------------------------------------------
+    #@
     open: ->
         @_$shell.show()
 
-    #---------------------------------------------------------------------------
+    #@ `close()`
+    #@ -------------------------------------------------------------------------
+    #@
     close: ->
         @_$shell.hide()
 
-    #---------------------------------------------------------------------------
+    #@ `destroy()`
+    #@ -------------------------------------------------------------------------
+    #@
     destroy: ->
         @close()
         @$element.dialog("destroy")
@@ -78,6 +88,9 @@ module.exports = class Shell
         
         @$element = null
         @_$shell  = null
+
+#-------------------------------------------------------------------------------
+_.extend(Shell, Backbone.Events)
 
 #-------------------------------------------------------------------------------
 generateRandomPosition = (width, height) ->
