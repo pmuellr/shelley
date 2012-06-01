@@ -1,5 +1,7 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
+window.localStorage.clear()
+
 jasmineEnv = jasmine.getEnv()
 jasmineEnv.updateInterval = 1000
 

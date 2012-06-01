@@ -1,25 +1,9 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
-Backbone = require "backbone"
+require "shelley"
 
+Backbone     = require "backbone"
 LocalStorage = require "shelley/persist/LocalStorage"
-StorageSync  = require "shelley/persist/StorageSync"
-
-Backbone.sync = StorageSync.sync
-
-#-------------------------------------------------------------------------------
-delayed = (millis, func) ->
-    setTimeout(func, millis)
-    
-if typeof window == "undefined"
-    global.window = {}
-    
-if !window.localStorage
-    window.localStorage =
-        _items:  {}
-        getItem: (name)        -> window.localStorage._items[name]
-        setItem: (name, value) -> window.localStorage._items[name] = value
-        clear:   ()            -> window.localStorage._items = {}
 
 #-------------------------------------------------------------------------------
 class Point extends Backbone.Model
@@ -33,8 +17,6 @@ class Point extends Backbone.Model
 #-------------------------------------------------------------------------------
 unexpectedError = (e) -> 
     throw new Error "should not have errored with #{e}"
-
-window.localStorage.clear()
 
 #-------------------------------------------------------------------------------
 describe "persist", ->

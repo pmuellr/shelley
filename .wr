@@ -8,7 +8,7 @@ make test
 lib-src
 bin-src
 test-src
-samples
+# samples
 
 package.cson
 Makefile

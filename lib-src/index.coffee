@@ -1,28 +1,53 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
-
 module.exports = new class Shelley
 
-    require "underscore"
-    require "backbone"
+    Backbone     = require "backbone"
+    LocalStorage = require "./persist/LocalStorage"
+    StorageSync  = require "./persist/StorageSync"
     
-    require "./persist"
+    Backbone.sync = StorageSync.sync
     
-    Shell        = require './Shell'
-    Workspace    = require './Workspace'
+    Workspace = require './models/Workspace'
 
     #-------------------------------------------------------------------------------
     constructor: ->
         @shellClasses = {}
-    
+        
+        @workspaces = new Backbone.Collection null, model: Workspace
+        @workspaces.storage = new LocalStorage name:"shelley.workspaces"
+
     #-------------------------------------------------------------------------------
     getWorkspaces: () ->
+        @workspaces.toArray()
     
     #-------------------------------------------------------------------------------
     createWorkspace: (name) ->
+        name = "#{name}"
+        
+        workspaces = @workspaces.where name: name
+        return workspaces[0] if workspaces.length
+
+        workspace = new Workspace 
+            name: name
+            
+        @workspaces.add workspace
+        
+        workspace.save()
+        
+        workspace
     
     #-------------------------------------------------------------------------------
     deleteWorkspace: (name) ->
+        workspaces = @workspaces.where name: name
+        return if !workspaces.length
+        
+        workspace = workspaces[0]
+        
+        @workspaces.remove workspace
+        @workspaces.save()
+        
+        workspace
     
     #-------------------------------------------------------------------------------
     openWorkspace: (name, element) ->
@@ -30,6 +55,10 @@ module.exports = new class Shelley
     #-------------------------------------------------------------------------------
     registerShellClass: (name, cls) ->
         @shellClasses[name] = cls
+    
+    #-------------------------------------------------------------------------------
+    getShellClass: (name) ->
+        @shellClasses[name]
     
 
 #-------------------------------------------------------------------------------

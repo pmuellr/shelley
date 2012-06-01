@@ -2,6 +2,8 @@
 (function() {
   var currentWindowOnload, execJasmine, jasmineEnv, trivialReporter;
 
+  window.localStorage.clear();
+
   jasmineEnv = jasmine.getEnv();
 
   jasmineEnv.updateInterval = 1000;

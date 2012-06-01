@@ -6,7 +6,8 @@
 
 module.exports = class LocalStorage extends require("./Storage")
 
-    _ = require "underscore"
+    _        = require "underscore"
+    Backbone = require "backbone"
     
     #-------------------------------------------------------------------------------
     initialize: (options) ->
@@ -56,8 +57,17 @@ module.exports = class LocalStorage extends require("./Storage")
 
     #-------------------------------------------------------------------------------
     _save: (result) ->
+        savedData = 
+            nextID: @data.nextID
+            
+        savedData.items = _.map @data.items, (item) -> 
+            if item instanceof Backbone.Model
+                item.toJSON()
+            else
+                item
+        
         try 
-            window.localStorage.setItem @name, JSON.stringify(@data)
+            window.localStorage.setItem @name, JSON.stringify(savedData)
             return [null, result]
         catch e
             return ["#{e}", null]

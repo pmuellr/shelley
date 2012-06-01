@@ -26,10 +26,7 @@ package.json: package.cson
 	@node tmp/tmp.js > package.json
 
 #-------------------------------------------------------------------------------
-build-shelley: lib/shelley.js
-
-#-------------------------------------------------------------------------------
-lib/shelley.js: lib-src/*.coffee lib-src/persist/*.coffee Makefile
+build-shelley: 
 	@echo "--------> building lib/shelley.js"
 
     # erase the ./lib directory
@@ -40,19 +37,15 @@ lib/shelley.js: lib-src/*.coffee lib-src/persist/*.coffee Makefile
 
 	@node_modules/.bin/coffee --compile --output tmp         lib-src/*.coffee
 	@node_modules/.bin/coffee --compile --output tmp/persist lib-src/persist/*.coffee
+	@node_modules/.bin/coffee --compile --output tmp/models  lib-src/models/*.coffee
 
     # copy our pesto modules over for browserify
 	@rm -rf tmp/*
-	@mkdir tmp/shelley
+	@-mkdir tmp/shelley
 
 	@cp -R lib-src/*               tmp/shelley
 	@echo "require('./shelley')" > tmp/index.js
 	
-	@echo "require('mocha')"              >> tmp/index-dev.js
-	@echo "require('should')"             >> tmp/index-dev.js
-	@echo "require('./shelley')"          >> tmp/index-dev.js
-	@echo "require('./shelley/dev-tty')"  >> tmp/index-dev.js
-
     # copy over 3rd party modules
 	@cp node_modules/backbone/backbone.js     tmp
 	@cp node_modules/underscore/underscore.js tmp
@@ -60,27 +53,16 @@ lib/shelley.js: lib-src/*.coffee lib-src/persist/*.coffee Makefile
     # run browserify
 	@echo "running browserify (rel)"
 	@node_modules/.bin/browserify tmp/index.js \
-        --debug --verbose \
+        --verbose \
         --alias 'shelley:/shelley' \
         --outfile lib/shelley.js
 
     # run browserify
 	@echo "running browserify (dev)"
-	@node_modules/.bin/browserify tmp/index-dev.js \
-        --debug --verbose \
-        --alias tty:/shelley/dev-tty \
-        --alias shelley:/shelley \
-        --ignore ./lib-cov/mocha \
-        --ignore stylus \
-        --ignore less \
-        --ignore markdown \
-        --ignore markdown-js \
-        --ignore discount \
-        --ignore marked \
-        --ignore child_process \
-        --ignore os \
-        --ignore stylus \
-        --outfile lib/shelley-dev.js
+	@node_modules/.bin/browserify tmp/index.js \
+        --debug \
+        --alias 'shelley:/shelley' \
+        --outfile lib/shelley-debug.js
 
 	@touch tmp/build-done.txt
 
