@@ -1,34 +1,39 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
+#-------------------------------------------------------------------------------
+# base Storage class for StorageSync
+#-------------------------------------------------------------------------------
 
-module.exports = new class Shelley
-
-    _ = require 'underscore'
-    
-    Shell     = require './Shell'
-    Workspace = require './Workspace'
+module.exports = class Storage
 
     #-------------------------------------------------------------------------------
     constructor: ->
-        @shellClasses = {}
+        @initialize.apply(@,arguments)
+        
+    #-------------------------------------------------------------------------------
+    initialize: ->
+        console.log "in Storage.initialize()"
     
     #-------------------------------------------------------------------------------
-    getWorkspaces: () ->
+    create: (collection, model) ->
+        throw new Error "subclass responsibility"
     
     #-------------------------------------------------------------------------------
-    createWorkspace: (name) ->
+    read: (collection, model) ->
+        throw new Error "subclass responsibility"
     
     #-------------------------------------------------------------------------------
-    deleteWorkspace: (name) ->
+    readAll: (collection, model) ->
+        throw new Error "subclass responsibility"
     
     #-------------------------------------------------------------------------------
-    openWorkspace: (name, element) ->
+    update: (collection, model) ->
+        throw new Error "subclass responsibility"
     
     #-------------------------------------------------------------------------------
-    registerShellClass: (name, cls) ->
-        @shellClasses[name] = cls
+    delete: (collection, model) ->
+        throw new Error "subclass responsibility"            
     
-
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller
 # 

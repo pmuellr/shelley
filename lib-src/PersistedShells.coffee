@@ -1,26 +1,22 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
-shelley  = require 'shelley'
-
 #-------------------------------------------------------------------------------
-main = ->
-    $('#button-open-shell').click openShell
+module.exports = class PersistedShells extends require("backbone").Collection
 
-#-------------------------------------------------------------------------------
-openShell = ->
-    content = $("<div>")
-    content.html "<p>opened at: #{Date()}"
-    content.addClass("green")
-    
-    shell = shelley.createShell 
-        title:     "closeable shell"
-        element:   content
-    
-    shell.open()
-    
-#-------------------------------------------------------------------------------
-$(document).ready(main)
+    PersistedShell    = require("./PersistedShell")
+    LocalStorageStore = require("./LocalStorageStore")
 
+    #-------------------------------------------------------------------------------
+    initialize: (models, options) ->
+        ws = options.ws
+        if !ws
+            throw new Error "workspace not specified in options"
+            
+        url = "shelley-#{ws.name}-PersistedShells"
+        
+        @model = PersistedShell
+        @store = new LocalStorageStore(url)
+    
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller
 # 

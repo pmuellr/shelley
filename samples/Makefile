@@ -1,6 +1,11 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
-build:
+buildAll:
+	@echo "-> building `pwd`"
+	@echo " " 
+	@cd basic; make
+
+buildOne:
 
 	@echo "-> building `pwd`"
 

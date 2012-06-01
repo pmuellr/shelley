@@ -1,8 +1,13 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
-build: buildOne
+#-------------------------------------------------------------------------------
+module.exports = class Workspace
 
-include ../Makefile
+    _        = require 'underscore'
+    Backbone = require 'backbone'
+    
+    shelley  = require 'shelley'
+
 
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller

@@ -11,6 +11,8 @@ bin-src
 lib-src
 Makefile
 samples
+test
+test-src
 
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller

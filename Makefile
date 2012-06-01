@@ -3,7 +3,7 @@
 .PHONY: build test vendor
 
 #-------------------------------------------------------------------------------
-all: build
+all: test
 
 #-------------------------------------------------------------------------------
 clean:
@@ -37,7 +37,8 @@ build-shelley:
     # pre-compile just to get syntax errors, since browserify doesn't
 	@-rm -rf tmp/*
 
-	@node_modules/.bin/coffee --compile --output tmp lib-src/*.coffee
+	@node_modules/.bin/coffee --compile --output tmp         lib-src/*.coffee
+	@node_modules/.bin/coffee --compile --output tmp/persist lib-src/persist/*.coffee
 
     # copy our pesto modules over for browserify
 	@rm -rf tmp/*
@@ -74,7 +75,7 @@ build-bin:
 
 #-------------------------------------------------------------------------------
 build-samples:
-	@cd samples/basic; make
+	@cd samples; make
 
 #-------------------------------------------------------------------------------
 tmp:
@@ -82,6 +83,12 @@ tmp:
 
 #-------------------------------------------------------------------------------
 test: build
+	@node_modules/.bin/mocha \
+	    --ui bdd \
+	    --compilers coffee:coffee-script \
+	    --reporter progress \
+	    test-src/*.coffee
+	
 
 #-------------------------------------------------------------------------------
 vendor:

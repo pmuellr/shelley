@@ -1,30 +1,24 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
-_        = require 'underscore'
-Backbone = require 'backbone'
-
-shelley  = require 'shelley'
-
-#@ `class Shell`
-#@ =============================================================================
-#@
+#-------------------------------------------------------------------------------
 module.exports = class Shell
 
-    #@ `constructor(options)`
-    #@ -------------------------------------------------------------------------
-    #@
+    _        = require 'underscore'
+    Backbone = require 'backbone'
+    
+    shelley  = require 'shelley'
+
+    _.extend(Shell, Backbone.Events)
+
+    #---------------------------------------------------------------------------
     constructor: (options) ->
         options = _.defaults options, 
             title:     "<???>"
-            closeable: true
-            modal:     false
             x:         null
             y:         null
             width:     400
             height:    300
             
-        @_modal = options.modal
-        
         element = options.element
         title   = options.title
 
@@ -32,18 +26,12 @@ module.exports = class Shell
         @element = @$element[0]
         
         @$element.dialog
-            autoOpen:      @_modal
+            autoOpen:      false
             closeOnEscape: false
             title:         title
-            modal:         @_modal
 
         @_$shell = @$element.dialog("widget")
         
-        return if @_modal
-        
-        if !options.closeable
-            $(".ui-dialog-titlebar-close", @_$shell).hide()
-            
         x = options.x
         y = options.y
         w = options.width
@@ -57,30 +45,22 @@ module.exports = class Shell
             height: h
             position: [x,y]
             
-    #@ `title(value)`
-    #@ -------------------------------------------------------------------------
-    #@
+    #---------------------------------------------------------------------------
     title: (value) ->
         if value
             @$element.dialog "option", "title", value
             
         @$element.dialog "option", "title"
 
-    #@ `open()`
-    #@ -------------------------------------------------------------------------
-    #@
+    #---------------------------------------------------------------------------
     open: ->
         @_$shell.show()
 
-    #@ `close()`
-    #@ -------------------------------------------------------------------------
-    #@
+    #---------------------------------------------------------------------------
     close: ->
         @_$shell.hide()
 
-    #@ `destroy()`
-    #@ -------------------------------------------------------------------------
-    #@
+    #---------------------------------------------------------------------------
     destroy: ->
         @close()
         @$element.dialog("destroy")
@@ -88,23 +68,20 @@ module.exports = class Shell
         
         @$element = null
         @_$shell  = null
-
-#-------------------------------------------------------------------------------
-_.extend(Shell, Backbone.Events)
-
-#-------------------------------------------------------------------------------
-generateRandomPosition = (width, height) ->
-    body = $(document.body)
-    pWidth  = body.width()
-    pHeight = body.height()
-    
-    x = Math.random() * (pWidth  - width  - 40)
-    y = Math.random() * (pHeight - height - 40)
-    
-    x = Math.max(0, x)
-    y = Math.max(0, y)
-    
-    [x, y]
+        
+    #---------------------------------------------------------------------------
+    generateRandomPosition = (width, height) ->
+        body = $(document.body)
+        pWidth  = body.width()
+        pHeight = body.height()
+        
+        x = Math.random() * (pWidth  - width  - 40)
+        y = Math.random() * (pHeight - height - 40)
+        
+        x = Math.max(0, x)
+        y = Math.max(0, y)
+        
+        [x, y]
 
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller
