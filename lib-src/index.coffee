@@ -3,10 +3,13 @@
 
 module.exports = new class Shelley
 
-    _ = require 'underscore'
+    require "underscore"
+    require "backbone"
     
-    Shell     = require './Shell'
-    Workspace = require './Workspace'
+    require "./persist"
+    
+    Shell        = require './Shell'
+    Workspace    = require './Workspace'
 
     #-------------------------------------------------------------------------------
     constructor: ->

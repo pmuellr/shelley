@@ -15,7 +15,7 @@ build: tmp package.json build-shelley build-bin build-samples
 
 #-------------------------------------------------------------------------------
 package.json: package.cson
-	@echo "-> building package.json"
+	@echo "--------> building package.json"
 
 	@echo building package.json
 	@-rm -rf tmp/*
@@ -25,11 +25,12 @@ package.json: package.cson
 	@cat  tmp/package.js >> tmp/tmp.js
 	@node tmp/tmp.js > package.json
 
-	@echo " "
+#-------------------------------------------------------------------------------
+build-shelley: lib/shelley.js
 
 #-------------------------------------------------------------------------------
-build-shelley:
-	@echo "-> building lib/shelley.js"
+lib/shelley.js: lib-src/*.coffee lib-src/persist/*.coffee Makefile
+	@echo "--------> building lib/shelley.js"
 
     # erase the ./lib directory
 	-@rm -rf lib/*
@@ -46,31 +47,50 @@ build-shelley:
 
 	@cp -R lib-src/*               tmp/shelley
 	@echo "require('./shelley')" > tmp/index.js
+	
+	@echo "require('mocha')"              >> tmp/index-dev.js
+	@echo "require('should')"             >> tmp/index-dev.js
+	@echo "require('./shelley')"          >> tmp/index-dev.js
+	@echo "require('./shelley/dev-tty')"  >> tmp/index-dev.js
 
     # copy over 3rd party modules
 	@cp node_modules/backbone/backbone.js     tmp
 	@cp node_modules/underscore/underscore.js tmp
 
     # run browserify
-	@echo "running browserify"
+	@echo "running browserify (rel)"
 	@node_modules/.bin/browserify tmp/index.js \
+        --debug --verbose \
         --alias 'shelley:/shelley' \
-	    --debug --verbose \
-	    --outfile lib/shelley.js
+        --outfile lib/shelley.js
+
+    # run browserify
+	@echo "running browserify (dev)"
+	@node_modules/.bin/browserify tmp/index-dev.js \
+        --debug --verbose \
+        --alias tty:/shelley/dev-tty \
+        --alias shelley:/shelley \
+        --ignore ./lib-cov/mocha \
+        --ignore stylus \
+        --ignore less \
+        --ignore markdown \
+        --ignore markdown-js \
+        --ignore discount \
+        --ignore marked \
+        --ignore child_process \
+        --ignore os \
+        --ignore stylus \
+        --outfile lib/shelley-dev.js
 
 	@touch tmp/build-done.txt
 
-	@echo " "
-
 #-------------------------------------------------------------------------------
 build-bin:
-	@echo "-> building bin"
+	@echo "--------> building bin"
 
 	@rm -rf bin/*
 	@cp bin-src/shelley bin
 	@node_modules/.bin/coffee --bare --compile --output bin bin-src/*.coffee
-
-	@echo " "
 
 
 #-------------------------------------------------------------------------------
@@ -82,7 +102,20 @@ tmp:
 	@-mkdir tmp
 
 #-------------------------------------------------------------------------------
-test: build
+test: build test-browser
+
+#-------------------------------------------------------------------------------
+test-browser:
+	@echo "--------> building test (browser)"
+
+	@-rm -rf test/*
+	@-cp test-src/*.html test/
+
+    # compile coffeescript
+	@node_modules/.bin/coffee --compile --output test test-src/*.coffee
+
+#-------------------------------------------------------------------------------
+test-node: 
 	@node_modules/.bin/mocha \
 	    --ui bdd \
 	    --compilers coffee:coffee-script \
@@ -91,7 +124,10 @@ test: build
 	
 
 #-------------------------------------------------------------------------------
-vendor:
+vendor: vendor-init vendor-jasmine vendor-jquery-ui
+
+#-------------------------------------------------------------------------------
+vendor-init:
 	@echo Downloading third party goop
 
     # installing npm modules
@@ -103,6 +139,10 @@ vendor:
 	@rm -rf vendor
 	@mkdir vendor
 
+#-------------------------------------------------------------------------------
+vendor-jquery-ui:
+	@echo Downloading jquery-ui
+	
     # installing jquery, coffee-script, mustache
 
 	@curl --output vendor/jquery.js        --progress-bar http://code.jquery.com/jquery-$(VERSION_JQUERY).min.js
@@ -123,9 +163,25 @@ vendor:
 	@cp tmp/development-bundle/themes/smoothness/jquery-ui-1.8.20.custom.css vendor/jquery-ui/themes/smoothness.css
 
 #-------------------------------------------------------------------------------
+vendor-jasmine: 
+	@echo Downloading jasmine
+
+#   get jasmine browserable bits
+	@rm -rf tmp
+	@mkdir  tmp
+	@curl --progress-bar \
+	   --output tmp/jasmine.zip \
+	   http://cloud.github.com/downloads/pivotal/jasmine/jasmine-standalone-$(VERSION_JASMINE).zip
+	@unzip tmp/jasmine.zip -d tmp
+
+#   copy jasmine browserable bits to /vendor/jasmine
+	@mv tmp/lib/jasmine-$(VERSION_JASMINE) vendor/jasmine
+
+#-------------------------------------------------------------------------------
 
 VERSION_JQUERY        = 1.7.1
 VERSION_JQUERY_UI     = 1.8.20
+VERSION_JASMINE       = 1.2.0
 
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller

@@ -1,7 +1,26 @@
-<!-- Licensed under the Tumbolia Public License. See footer for details. -->
-shells! shells! shells!
+# Licensed under the Tumbolia Public License. See footer for details.
 
-<!-- 
+jasmineEnv = jasmine.getEnv()
+jasmineEnv.updateInterval = 1000
+
+trivialReporter = new jasmine.TrivialReporter()
+
+jasmineEnv.addReporter(trivialReporter)
+
+jasmineEnv.specFilter = (spec) ->
+    trivialReporter.specFilter(spec)
+
+currentWindowOnload = window.onload
+
+window.onload = ->
+    if currentWindowOnload
+        currentWindowOnload()
+        
+    execJasmine()
+
+execJasmine = ->
+    jasmineEnv.execute()
+
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller
 # 
@@ -15,4 +34,3 @@ shells! shells! shells!
 # 
 #   0. opan saurce LOL
 #-------------------------------------------------------------------------------
--->

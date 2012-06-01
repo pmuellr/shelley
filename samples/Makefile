@@ -1,17 +1,17 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
+PWD = $(shell pwd)
+BWD = $(shell basename $(PWD))
+
 buildAll:
-	@echo "-> building `pwd`"
-	@echo " " 
+	@echo "--------> building $(BWD)"
 	@cd basic; make
 
 buildOne:
 
-	@echo "-> building `pwd`"
+	@echo "------------> building $(BWD)"
 
 	@../../node_modules/.bin/coffee --compile *.coffee
-	    
-	@echo " " 
 
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller

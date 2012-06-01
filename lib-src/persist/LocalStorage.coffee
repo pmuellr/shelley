@@ -38,7 +38,7 @@ module.exports = class LocalStorage extends require("./Storage")
     
     #-------------------------------------------------------------------------------
     readAll: (collection) ->
-        result = _.values(this.data)    
+        result = _.values(@data.items)    
 
         return [null, result]
     
