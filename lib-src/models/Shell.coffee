@@ -3,6 +3,15 @@
 Backbone = require "backbone"
 _        = require "underscore"
 
+#-------------------------------------------------------------------------------
+# attributes
+#-------------------------------------------------------------------------------
+#   position:   [Number, Number]
+#   size:       [Number, Number]
+#   shellModel: String
+#   memento:    Object
+#-------------------------------------------------------------------------------
+
 module.exports = class Shell extends Backbone.Model
 
     #---------------------------------------------------------------------------
@@ -43,6 +52,13 @@ module.exports = class Shell extends Backbone.Model
         if shellClass
             if typeof shellClass != "string"
                 return new Error "shellClass must be a string"
+
+        memento = attributes.memento
+        if memento
+            try 
+                JSON.stringify memento
+            catch e
+                return e
     
 
 #-------------------------------------------------------------------------------

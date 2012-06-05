@@ -5,18 +5,29 @@ shelley  = require 'shelley'
 #-------------------------------------------------------------------------------
 main = ->
     $('#button-open-shell').click openShell
+    
+    shelley.registerShellModel "hello.world", HelloWorldShell
+    
+    shelley.ws.open()
+    
+
+#-------------------------------------------------------------------------------
+class HelloWorldShell extends shelley.models.Shell
+    
+    #---------------------------------------------------------------------------
+    initialize: (attrs) ->
+    
+    #---------------------------------------------------------------------------
+    createContent: ->
+        content = $("<div>")
+        content.html "<p>Hello, World! <p>opened at: #{@get('date')}"
+
+        return content[0]        
 
 #-------------------------------------------------------------------------------
 openShell = ->
-    content = $("<div>")
-    content.html "<p>opened at: #{Date()}"
-    content.addClass("green")
-    
-    shell = shelley.createShell 
-        title:     "closeable shell"
-        element:   content
-    
-    shell.open()
+    shelley.createShell "hello.world", 
+        date: Date()
     
 #-------------------------------------------------------------------------------
 $(document).ready(main)

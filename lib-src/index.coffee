@@ -1,27 +1,52 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
-module.exports = new class Shelley
+Backbone     = require "backbone"
+LocalStorage = require "./persist/LocalStorage"
+StorageSync  = require "./persist/StorageSync"
+expando      = require "./expando"
+Workspace    = require './models/Workspace'
 
-    Backbone     = require "backbone"
-    LocalStorage = require "./persist/LocalStorage"
-    StorageSync  = require "./persist/StorageSync"
-    
-    Backbone.sync = StorageSync.sync
-    
-    Workspace = require './models/Workspace'
+Backbone.sync = StorageSync.sync
 
-    #-------------------------------------------------------------------------------
-    constructor: ->
-        @shellClasses = {}
+#-------------------------------------------------------------------------------
+shelley = module.exports = new class Shelley extends Backbone.Model
+
+    #---------------------------------------------------------------------------
+    initialize: ->
+        @shellModels = {}
         
-        @workspaces = new Backbone.Collection null, model: Workspace
-        @workspaces.storage = new LocalStorage name:"shelley.workspaces"
+        @models = 
+            Shell:        require "./models/Shell"
+            Workspace:    require "./models/Workspace"
+            Meta:         require "./models/Meta"    
 
-    #-------------------------------------------------------------------------------
+        metaCollection = new Backbone.Collection null, model: @models.Meta
+        metaCollection.storage = new LocalStorage name: "shelley.meta"
+        
+        @on "change:meta", (model, meta, options) ->
+            meta.get            
+        
+        metaCollection.fetch
+            error:   unexpectedError
+            success: (coll) => 
+                if coll.length
+                    @set "meta", coll.at 0
+                else
+                    meta = new @models.Meta
+                        workspaces: []
+                        currentWorkspace: "default"
+                        
+                    coll.add meta
+                    @set "meta", meta
+
+    #---------------------------------------------------------------------------
+    declareAttributes: expando.declareAttributes
+
+    #---------------------------------------------------------------------------
     getWorkspaces: () ->
         @workspaces.toArray()
     
-    #-------------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
     createWorkspace: (name) ->
         name = "#{name}"
         
@@ -37,7 +62,7 @@ module.exports = new class Shelley
         
         workspace
     
-    #-------------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
     deleteWorkspace: (name) ->
         workspaces = @workspaces.where name: name
         return if !workspaces.length
@@ -53,12 +78,21 @@ module.exports = new class Shelley
     openWorkspace: (name, element) ->
     
     #-------------------------------------------------------------------------------
-    registerShellClass: (name, cls) ->
-        @shellClasses[name] = cls
+    registerShellModel: (name, cls) ->
+        @shellModels[name] = cls
     
     #-------------------------------------------------------------------------------
-    getShellClass: (name) ->
-        @shellClasses[name]
+    getShellModel: (name) ->
+        @shellModels[name]
+
+#-------------------------------------------------------------------------------
+fetchedMetaCollection = (coll) ->
+    shelley.
+    shelley.set "meta", coll.at 0
+
+#-------------------------------------------------------------------------------
+unexpectedError = (e) -> 
+    throw new Error "should not have errored with #{e}"
     
 
 #-------------------------------------------------------------------------------

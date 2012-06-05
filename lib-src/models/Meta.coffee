@@ -1,18 +1,20 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
+Backbone = require "backbone"
+_        = require "underscore"
+
 #-------------------------------------------------------------------------------
-module.exports = class Workspace extends require('backbone').Model
+# attributes
+#-------------------------------------------------------------------------------
+#   workspaces:       [String]
+#   currentWorkspace:  String
+#-------------------------------------------------------------------------------
+
+module.exports = class Meta extends Backbone.Model
 
     #---------------------------------------------------------------------------
-    initialize: (attrs) ->
-        @name = attrs.name
-
-    #---------------------------------------------------------------------------
-    open: ->
-
-    #---------------------------------------------------------------------------
-    close: ->
-
+    toString: -> "#{@constructor.name}#{JSON.stringify(@attributes)}"
+    
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller
 # 
