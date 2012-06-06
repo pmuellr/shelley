@@ -3,7 +3,7 @@
 Backbone     = require "backbone"
 LocalStorage = require "./persist/LocalStorage"
 StorageSync  = require "./persist/StorageSync"
-expando      = require "./expando"
+attrx        = require "./attrx"
 Workspace    = require './models/Workspace'
 
 Backbone.sync = StorageSync.sync
@@ -38,9 +38,6 @@ shelley = module.exports = new class Shelley extends Backbone.Model
                         
                     coll.add meta
                     @set "meta", meta
-
-    #---------------------------------------------------------------------------
-    declareAttributes: expando.declareAttributes
 
     #---------------------------------------------------------------------------
     getWorkspaces: () ->
