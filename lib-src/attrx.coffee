@@ -232,7 +232,7 @@ getValidator = (descriptor) ->
 
 #-------------------------------------------------------------------------------
 isBaseType = (descriptor) ->
-    switch
+    switch descriptor
         when Object, Boolean, Number, String then return true
         else return false
 

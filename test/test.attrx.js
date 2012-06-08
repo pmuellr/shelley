@@ -225,12 +225,15 @@
     });
     it("handles parsing arrayed model types", function() {
       var attrs, ma2;
-      ma.mb = mb;
-      ma.mc = mc;
+      mb.b = true;
+      ma.amb = [mb];
       attrs = ma.toJSON();
-      return ma2 = new A(attrs, {
+      ma2 = new A(attrs, {
         parse: true
       });
+      expect(ma2.amb instanceof Backbone.Collection).toEqual(true);
+      expect(ma2.amb.length).toEqual(1);
+      return expect((ma2.amb.at(0)).toJSON()).toEqual(mb.toJSON());
     });
     it("handles scalar model types", function() {
       ma.mb = mb;

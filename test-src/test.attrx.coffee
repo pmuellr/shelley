@@ -5,7 +5,7 @@ Backbone = require "backbone"
 attrx = require "shelley/attrx"
 
 #-------------------------------------------------------------------------------
-class D extends Backbone.Model
+class D extends Backbone.Model 
     attrx.declareAttributes @, 
         s:  type: String
 
@@ -133,14 +133,15 @@ describe "attrx", ->
 
     #---------------------------------------------------------------------------
     it "handles parsing arrayed model types", () ->
-        ma.mb = mb
-        ma.mc = mc
 
+        mb.b = true
+        ma.amb = [ mb ]
         attrs = ma.toJSON()
         ma2 = new A(attrs, parse: true)
         
-#        expect(ma2.mb).toEqual(mb)
-#        expect(ma2.mc).toEqual(mc)
+        expect(ma2.amb instanceof Backbone.Collection).toEqual(true)
+        expect(ma2.amb.length).toEqual(1)
+        expect((ma2.amb.at 0).toJSON()).toEqual(mb.toJSON())
 
     #---------------------------------------------------------------------------
     it "handles scalar model types", () ->
