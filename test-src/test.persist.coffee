@@ -1,51 +1,53 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
-require "shelley"
+Backbone = require "backbone"
 
-Backbone     = require "backbone"
-LocalStorage = require "shelley/persist/LocalStorage"
+Storage  = require "shelley/persist/ModelLocalStorageSync"
+attrx    = require "shelley/attrx"
 
 #-------------------------------------------------------------------------------
 class Point extends Backbone.Model
     
     #---------------------------------------------------------------------------
+    attrx.declareAttributes @, 
+        x:  type: Number
+        y:  type: Number
+        
+    #---------------------------------------------------------------------------
     isPoint: -> true
 
-    #---------------------------------------------------------------------------
-    toString: -> "#{@constructor.name}#{JSON.stringify(@attributes)}"
-
 #-------------------------------------------------------------------------------
-unexpectedError = (e) -> 
+unexpectedError = (model, e) -> 
     throw new Error "should not have errored with #{e}"
 
 #-------------------------------------------------------------------------------
 describe "persist", ->
 
+    point12 = null
+    
     #---------------------------------------------------------------------------
     beforeEach ->
+        point12 = new Point
+            x: 1
+            y: 2
         
     #---------------------------------------------------------------------------
     afterEach ->
 
     #---------------------------------------------------------------------------
-    it "should handle new collections", () ->
-        coll = new Backbone.Collection null, model: Point
+    it "should handle new models", () ->
             
-        coll.storage = new LocalStorage name:"test-1"
-            
-        point = 
-            x: 1
-            y: 2
+        point12.sync = Storage.sync "test-1"
         
         createdModel = null
 
         #-----------------------------------------------------------------------        
-        createdModelCB = (model) -> 
+        createdModelCB = (model, attr) -> 
             createdModel = model
         
         #-----------------------------------------------------------------------        
         runs ->
-            coll.create point, 
+            point12.save null,
                 error:   unexpectedError
                 success: createdModelCB
                  
@@ -58,152 +60,110 @@ describe "persist", ->
         
         #-----------------------------------------------------------------------        
         runs ->
-            expect(createdModel.get("x")).toEqual(point.x)
-            expect(createdModel.get("y")).toEqual(point.y)
+            expect(createdModel.x).toEqual(point12.x)
+            expect(createdModel.y).toEqual(point12.y)
+            expect(createdModel.isPoint()).toEqual(true)
             
     #---------------------------------------------------------------------------
-    it "should handle fetching a saved collection", () ->
-        coll = new Backbone.Collection null, model: Point
+    it "should handle fetching a saved model", () ->
+        point = new Point
+        point.sync = Storage.sync "test-1"
             
-        coll.storage = new LocalStorage name:"test-2"
-            
-        point = 
-            x: 1
-            y: 2
+        fetchedModel = null
+
+        #-----------------------------------------------------------------------        
+        fetchedModelCB = (model, attr) -> 
+            fetchedModel = model
         
-        restoredColl = null
-
-        #-----------------------------------------------------------------------        
-        createdModelCB = (model) ->
-            expect(model.get("x")).toEqual(point.x)
-            
-            coll.fetch
-                error:   unexpectedError
-                success: fetchedCollCB
-            
-        #-----------------------------------------------------------------------        
-        fetchedCollCB = (coll) ->
-            restoredColl = coll
-
         #-----------------------------------------------------------------------        
         runs ->
-            coll.create point, 
+            point.fetch
                 error:   unexpectedError
-                success: createdModelCB
+                success: fetchedModelCB
                  
         #-----------------------------------------------------------------------        
         waiter = ->
-            return restoredColl
+            return fetchedModel
             
         #-----------------------------------------------------------------------        
-        waitsFor waiter, "The collection should have been fetched", 1000
+        waitsFor waiter, "The model should have been fetched", 1000
         
         #-----------------------------------------------------------------------        
         runs ->
-            expect(restoredColl.at(0).get("x")).toEqual(point.x)
-            expect(restoredColl.at(0).get("y")).toEqual(point.y)
+            expect(fetchedModel.x).toEqual(point12.x)
+            expect(fetchedModel.y).toEqual(point12.y)
+            expect(fetchedModel.isPoint()).toEqual(true)
             
     #---------------------------------------------------------------------------
-    it "should handle updating an item", () ->
-        coll = new Backbone.Collection null, model: Point
-            
-        coll.storage = new LocalStorage name:"test-3"
-            
-        point = 
-            x: 1
-            y: 2
-        
-        restoredColl = null
+    it "should handle updating a model", () ->
+        point = new Point
+        point.sync = Storage.sync "test-1"
+
+        updatedModel = null
 
         #-----------------------------------------------------------------------        
-        createdModelCB = (model) ->
-            expect(model.get("x")).toEqual(point.x)
-            
-            model.set("x", 3)
-            
+        fetchedModelCB = (model, attr) -> 
+            model.x = 3
             model.save null,
                 error:   unexpectedError
                 success: updatedModelCB
-            
+        
         #-----------------------------------------------------------------------        
-        updatedModelCB = (model) ->
-            expect(model.get("x")).toEqual(3)
-            
-            coll.fetch
-                error:   unexpectedError
-                success: fetchedCollCB
-
-        #-----------------------------------------------------------------------        
-        fetchedCollCB = (coll) ->
-            restoredColl = coll
-
+        updatedModelCB = (model, attr) -> 
+            updatedModel = model
+        
         #-----------------------------------------------------------------------        
         runs ->
-            coll.create point, 
+            point.fetch
                 error:   unexpectedError
-                success: createdModelCB
+                success: fetchedModelCB
                  
         #-----------------------------------------------------------------------        
         waiter = ->
-            return restoredColl
+            return updatedModel
             
         #-----------------------------------------------------------------------        
-        waitsFor waiter, "The collection should have been updated", 1000
+        waitsFor waiter, "The model should have been updated", 1000
         
         #-----------------------------------------------------------------------        
         runs ->
-            expect(restoredColl.length).toEqual(1)
-            expect(restoredColl.at(0).get("x")).toEqual(3)
-            expect(restoredColl.at(0).get("y")).toEqual(point.y)
-            
+            expect(updatedModel.x).toEqual(3)
+            expect(updatedModel.y).toEqual(point12.y)
+            expect(updatedModel.isPoint()).toEqual(true)
+
     #---------------------------------------------------------------------------
-    it "should handle deleting an item", () ->
-        coll = new Backbone.Collection null, model: Point
-            
-        coll.storage = new LocalStorage name:"test-4"
-            
-        point = 
-            x: 1
-            y: 2
-        
-        restoredColl = null
+    it "should handle deleting a model", () ->
+        point = new Point
+        point.sync = Storage.sync "test-1"
+
+        deletedModel = null
 
         #-----------------------------------------------------------------------        
-        createdModelCB = (model) ->
+        fetchedModelCB = (model, attr) -> 
             model.destroy
                 error:   unexpectedError
                 success: deletedModelCB
-            
-        #-----------------------------------------------------------------------        
-        deletedModelCB = (model) ->
-            expect(model.get("x")).toEqual(point.x)
-            expect(model.get("y")).toEqual(point.y)
-            expect(coll.length).toEqual(0)
-            
-            coll.fetch
-                error:   unexpectedError
-                success: fetchedCollCB
 
         #-----------------------------------------------------------------------        
-        fetchedCollCB = (coll) ->
-            restoredColl = coll
-
-        #-----------------------------------------------------------------------        
-        runs ->
-            coll.create point, 
-                error:   unexpectedError
-                success: createdModelCB
-                 
-        #-----------------------------------------------------------------------        
-        waiter = ->
-            return restoredColl
-            
-        #-----------------------------------------------------------------------        
-        waitsFor waiter, "The model should have been deleted", 1000
+        deletedModelCB = (model, attr) -> 
+            deletedModel = model
         
         #-----------------------------------------------------------------------        
         runs ->
-            expect(restoredColl.length).toEqual(0)
+            point.fetch
+                error:   unexpectedError
+                success: fetchedModelCB
+                 
+        #-----------------------------------------------------------------------        
+        waiter = ->
+            return deletedModel
+            
+        #-----------------------------------------------------------------------        
+        waitsFor waiter, "The model should have been updated", 1000
+        
+        #-----------------------------------------------------------------------        
+        runs ->
+            expect(window.localStorage.getItem("test-1")).toBeNull()
             
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller

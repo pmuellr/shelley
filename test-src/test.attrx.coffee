@@ -1,36 +1,34 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
-shelley = require "shelley"
+Backbone = require "backbone"
 
-Backbone     = require "backbone"
-LocalStorage = require "shelley/persist/LocalStorage"
-attrx        = require "shelley/attrx"
+attrx = require "shelley/attrx"
 
 #-------------------------------------------------------------------------------
 class D extends Backbone.Model
-    attrx.declareAttributes D, 
+    attrx.declareAttributes @, 
         s:  type: String
 
 #-------------------------------------------------------------------------------
 class B extends Backbone.Model
-    attrx.declareAttributes B, 
+    attrx.declareAttributes @, 
         b:  type: Boolean
         md: type: D
 
 #-------------------------------------------------------------------------------
 class B2 extends B
-    attrx.declareAttributes B2, 
+    attrx.declareAttributes @, 
         n: type: Number
 
 #-------------------------------------------------------------------------------
 class C extends Backbone.Model
-    attrx.declareAttributes C, 
+    attrx.declareAttributes @, 
         mb:  type: B
         mb2: type: B2
 
 #-------------------------------------------------------------------------------
 class A extends Backbone.Model
-    attrx.declareAttributes A, 
+    attrx.declareAttributes @, 
         b:    type: Boolean
         n:    type: Number
         s:    type: String

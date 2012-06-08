@@ -2,37 +2,32 @@
 
 Backbone = require "backbone"
 _        = require "underscore"
-Shell    = require "./Shell"
 
+Shell    = require "./Shell"
+attrx = require "../attrx"
+
+#-------------------------------------------------------------------------------
 module.exports = class Workspace extends Backbone.Model
 
     #---------------------------------------------------------------------------
     toString: -> "#{@constructor.name}#{JSON.stringify(@attributes)}"
 
     #---------------------------------------------------------------------------
-    validate: (attributes) ->
-        
-        name = attributes.name
-        if name
-            if typeof name != "string"
-                return new Error "name must be a string"
-
-    #---------------------------------------------------------------------------
-    toJSON: ->
-        attrs = _.clone(@attributes)
-        
-        if attrs.shells
-            attrs.shells = attrs.shells.toJSON()
-            
-        attrs
+    attrx.declareAttributes @, 
+        name:   type: String
+        shells: type: [Shell]
         
     #---------------------------------------------------------------------------
-    parse: (response) ->
-        shells = response.shells
-        shells = new Backbone.Collection shells, model: Shell
+    @create = (name) ->
+        coll         = new Backbone.Collection null, model: Workspace
+        coll.storage = new LocalStorage name: "shelley.ws.#{name}"
         
-        response.shells = shells
-        response
+    #---------------------------------------------------------------------------
+    @get = (name) ->
+        coll         = new Backbone.Collection null, model: Workspace
+        coll.storage = new LocalStorage name: "shelley.ws.#{name}"
+    
+    
 
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller

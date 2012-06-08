@@ -42,10 +42,19 @@ _        = require "underscore"
 # reconsistitute an attribute value as a model class, via parse().
 #-------------------------------------------------------------------------------
 
+#-------------------------------------------------------------------------------
+# attrx exports a bag of functions
+#-------------------------------------------------------------------------------
 attrx = module.exports
 
+#-------------------------------------------------------------------------------
+# attrx.declareAttributes takes a model class, and object containing
+# attributes to be declared on the model class.
+#-------------------------------------------------------------------------------
 attrx.declareAttributes = (modelClass, attrxAttrs) ->
 
+    # loop through the attributes, add the setters/getters to the prototype
+    # and collect the parse functions
     parseFns = []
     for key, val of attrxAttrs
 
@@ -62,23 +71,32 @@ attrx.declareAttributes = (modelClass, attrxAttrs) ->
         
         Object.defineProperty modelClass::, key, descriptor
         
+    # set the model class's parse method
     modelClass::parse = getCompleteParser parseFns
     
+    # set the model class's toJSON() method
     modelClass::toJSON = ->
-        JSON.parse JSON.stringify @.attributes
+        JSON.parse JSON.stringify @attributes
         
+#-------------------------------------------------------------------------------
+# return the getter function for a given attribute name
 #-------------------------------------------------------------------------------
 getGetter = (key) ->
     -> @get key
     
 #-------------------------------------------------------------------------------
+# return the setter function for a given attribute name
+#-------------------------------------------------------------------------------
 getSetter = (key, validator) ->
-    (value) -> 
+    (value) ->
+        # validate the value
         if !validator.call(null, value)
             throw new Error "invalid value for attribute #{key}"
             
         @set key, value
 
+#-------------------------------------------------------------------------------
+# given parse functions for each attribute, return a function which calls them
 #-------------------------------------------------------------------------------
 getCompleteParser = (parseFns) ->
     return (attrs) ->
@@ -89,6 +107,8 @@ getCompleteParser = (parseFns) ->
             
         attrs
 
+#-------------------------------------------------------------------------------
+# get a parser for given type descriptor with the given attribute name
 #-------------------------------------------------------------------------------
 getParser = (descriptor, key) ->
     descriptor = Object if !descriptor
@@ -131,6 +151,8 @@ getParser = (descriptor, key) ->
         
         return attrs
 
+#-------------------------------------------------------------------------------
+# get a validator function for the given type descriptor
 #-------------------------------------------------------------------------------
 getValidator = (descriptor) ->
     descriptor = Object if !descriptor
