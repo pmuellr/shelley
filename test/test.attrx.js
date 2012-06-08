@@ -104,6 +104,9 @@
       s: {
         type: String
       },
+      d: {
+        type: Date
+      },
       o: {
         type: Object
       },
@@ -163,10 +166,12 @@
       };
     });
     it("handles parsing base types", function() {
-      var attrs, ma2;
+      var attrs, d, ma2;
+      d = new Date;
       ma.b = true;
       ma.n = 5;
       ma.s = "x";
+      ma.d = d;
       ma.o = rando1;
       attrs = ma.toJSON();
       ma2 = new A(attrs, {
@@ -175,6 +180,7 @@
       expect(ma2.b).toEqual(true);
       expect(ma2.n).toEqual(5);
       expect(ma2.s).toEqual("x");
+      expect(ma2.d.toISOString()).toEqual(d.toISOString());
       return expect(ma2.o).toEqual(rando1);
     });
     it("handles parsing array types", function() {

@@ -118,14 +118,19 @@ getParser = (descriptor, key) ->
         
     if _.isArray(descriptor)
         valueParser = getParser descriptor[0]
+        useCollection = isModelType descriptor[0]
     
         return (attrs) ->
             return attrs if !attrs?
-            arr = attrs.key
+            arr = attrs[key]
             return attrs if !arr
             
             for i in [0 ... arr.length]
                 arr[i] = valueParser arr[i]
+                
+            if useCollection
+                collClass = Backbone.Collection.extend model: descriptor[0]
+                attrs[key] = new collClass(arr)
                 
             return attrs
         
@@ -138,6 +143,33 @@ getParser = (descriptor, key) ->
     if descriptor == String
         return (attrs) -> attrs
 
+    if descriptor == Date
+        return (attrs) -> 
+            return attrs if !attrs?
+            dateString = attrs[key]
+            return attrs if !dateString
+        
+            # 2011-10-10T14:48:00.000Z
+            pattern = /(\d{4}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).(\d{2})(.(\d*))?Z/
+            match = dateString.match(pattern)
+            if !match
+                return attrs
+                
+            [crap1,yr,mo,da,hr,mi,se,crap2,ms] = match
+            
+            yr = parseInt yr, 10
+            mo = parseInt mo, 10
+            da = parseInt da, 10
+            hr = parseInt hr, 10
+            mi = parseInt mi, 10
+            se = parseInt se, 10
+            ms = parseInt ms, 10
+
+            utcms = Date.UTC(yr, mo-1, da, hr, mi, se, ms)
+            attrs[key] = new Date(utcms)
+            
+            return attrs
+        
     if typeof descriptor != "function"
         return (attrs) -> attrs
 
@@ -186,12 +218,29 @@ getValidator = (descriptor) ->
             return true if !value?
             typeof value == "string"
         
+    if descriptor == Date
+        return (value) -> 
+            return true if !value?
+            value instanceof Date
+        
     if typeof descriptor != "function"
         throw new Error "invalid validator"
         
     return (value) ->
         return true if !value?
         return value instanceof descriptor
+
+#-------------------------------------------------------------------------------
+isBaseType = (descriptor) ->
+    switch
+        when Object, Boolean, Number, String then return true
+        else return false
+
+#-------------------------------------------------------------------------------
+isModelType = (descriptor) ->
+    return false if typeof descriptor != "function"
+    return false if isBaseType(descriptor)
+    return true
     
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller

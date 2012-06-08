@@ -32,6 +32,7 @@ class A extends Backbone.Model
         b:    type: Boolean
         n:    type: Number
         s:    type: String
+        d:    type: Date
         o:    type: Object
         ab:   type: [Boolean]
         ao:   type: [Object]
@@ -68,9 +69,12 @@ describe "attrx", ->
 
     #---------------------------------------------------------------------------
     it "handles parsing base types", () ->
+        d = new Date
+        
         ma.b = true
         ma.n = 5
         ma.s = "x"
+        ma.d = d
         ma.o = rando1
 
         attrs = ma.toJSON()
@@ -79,6 +83,7 @@ describe "attrx", ->
         expect(ma2.b).toEqual(true)
         expect(ma2.n).toEqual(5)
         expect(ma2.s).toEqual("x")
+        expect(ma2.d.toISOString()).toEqual(d.toISOString())
         expect(ma2.o).toEqual(rando1)
 
     #---------------------------------------------------------------------------
