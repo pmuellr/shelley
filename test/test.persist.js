@@ -53,7 +53,7 @@
       var createdModel, createdModelCB, waiter;
       point12.sync = Storage.sync("test-1");
       createdModel = null;
-      createdModelCB = function(model, attr) {
+      createdModelCB = function(model, attrs) {
         return createdModel = model;
       };
       runs(function() {
@@ -77,7 +77,7 @@
       point = new Point;
       point.sync = Storage.sync("test-1");
       fetchedModel = null;
-      fetchedModelCB = function(model, attr) {
+      fetchedModelCB = function(model, attrs) {
         return fetchedModel = model;
       };
       runs(function() {
@@ -101,14 +101,14 @@
       point = new Point;
       point.sync = Storage.sync("test-1");
       updatedModel = null;
-      fetchedModelCB = function(model, attr) {
+      fetchedModelCB = function(model, attrs) {
         model.x = 3;
         return model.save(null, {
           error: unexpectedError,
           success: updatedModelCB
         });
       };
-      updatedModelCB = function(model, attr) {
+      updatedModelCB = function(model, attrs) {
         return updatedModel = model;
       };
       runs(function() {
@@ -132,13 +132,13 @@
       point = new Point;
       point.sync = Storage.sync("test-1");
       deletedModel = null;
-      fetchedModelCB = function(model, attr) {
+      fetchedModelCB = function(model, attrs) {
         return model.destroy({
           error: unexpectedError,
           success: deletedModelCB
         });
       };
-      deletedModelCB = function(model, attr) {
+      deletedModelCB = function(model, attrs) {
         return deletedModel = model;
       };
       runs(function() {

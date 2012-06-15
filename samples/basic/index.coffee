@@ -4,6 +4,8 @@ shelley  = require 'shelley'
 
 #-------------------------------------------------------------------------------
 main = ->
+    shelley.wm.on "ready", ->
+    
     $('#button-open-shell').click openShell
     
     shelley.registerShellModel "hello.world", HelloWorldShell

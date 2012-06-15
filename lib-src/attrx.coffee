@@ -56,12 +56,18 @@ attrx.declareAttributes = (modelClass, attrxAttrs) ->
     # loop through the attributes, add the setters/getters to the prototype
     # and collect the parse functions
     parseFns = []
+    transientKeys = []
     for key, val of attrxAttrs
+        type      = val.type
+        transient = !!val.transient
 
-        validator = getValidator val.type
-        parser    = getParser    val.type, key
+        validator = getValidator type
+        parser    = getParser    type, key
         
-        parseFns.push  parser
+        if transient
+            transientKeys.push key
+        else
+            parseFns.push  parser
         
         descriptor =
             configurable: true
@@ -76,7 +82,11 @@ attrx.declareAttributes = (modelClass, attrxAttrs) ->
     
     # set the model class's toJSON() method
     modelClass::toJSON = ->
-        JSON.parse JSON.stringify @attributes
+        attrs = _.clone(@attributes)
+        for transientKey in transientKeys
+            delete attrs[transientKey]
+            
+        JSON.parse JSON.stringify attrs
         
 #-------------------------------------------------------------------------------
 # return the getter function for a given attribute name
@@ -121,9 +131,9 @@ getParser = (descriptor, key) ->
         useCollection = isModelType descriptor[0]
     
         return (attrs) ->
-            return attrs if !attrs?
-            arr = attrs[key]
-            return attrs if !arr
+            attrs = {} if !attrs
+            
+            arr = attrs[key] || []
             
             for i in [0 ... arr.length]
                 arr[i] = valueParser arr[i]
@@ -131,6 +141,8 @@ getParser = (descriptor, key) ->
             if useCollection
                 collClass = Backbone.Collection.extend model: descriptor[0]
                 attrs[key] = new collClass(arr)
+            else
+                attrs[key] = arr
                 
             return attrs
         
@@ -233,7 +245,7 @@ getValidator = (descriptor) ->
 #-------------------------------------------------------------------------------
 isBaseType = (descriptor) ->
     switch descriptor
-        when Object, Boolean, Number, String then return true
+        when Object, Boolean, Number, String, Date then return true
         else return false
 
 #-------------------------------------------------------------------------------

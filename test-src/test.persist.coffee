@@ -42,7 +42,7 @@ describe "persist", ->
         createdModel = null
 
         #-----------------------------------------------------------------------        
-        createdModelCB = (model, attr) -> 
+        createdModelCB = (model, attrs) -> 
             createdModel = model
         
         #-----------------------------------------------------------------------        
@@ -72,7 +72,7 @@ describe "persist", ->
         fetchedModel = null
 
         #-----------------------------------------------------------------------        
-        fetchedModelCB = (model, attr) -> 
+        fetchedModelCB = (model, attrs) -> 
             fetchedModel = model
         
         #-----------------------------------------------------------------------        
@@ -102,14 +102,14 @@ describe "persist", ->
         updatedModel = null
 
         #-----------------------------------------------------------------------        
-        fetchedModelCB = (model, attr) -> 
+        fetchedModelCB = (model, attrs) -> 
             model.x = 3
             model.save null,
                 error:   unexpectedError
                 success: updatedModelCB
         
         #-----------------------------------------------------------------------        
-        updatedModelCB = (model, attr) -> 
+        updatedModelCB = (model, attrs) -> 
             updatedModel = model
         
         #-----------------------------------------------------------------------        
@@ -139,13 +139,13 @@ describe "persist", ->
         deletedModel = null
 
         #-----------------------------------------------------------------------        
-        fetchedModelCB = (model, attr) -> 
+        fetchedModelCB = (model, attrs) -> 
             model.destroy
                 error:   unexpectedError
                 success: deletedModelCB
 
         #-----------------------------------------------------------------------        
-        deletedModelCB = (model, attr) -> 
+        deletedModelCB = (model, attrs) -> 
             deletedModel = model
         
         #-----------------------------------------------------------------------        

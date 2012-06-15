@@ -7,6 +7,7 @@
   shelley = require('shelley');
 
   main = function() {
+    shelley.wm.on("ready", function() {});
     $('#button-open-shell').click(openShell);
     shelley.registerShellModel("hello.world", HelloWorldShell);
     return shelley.ws.open();

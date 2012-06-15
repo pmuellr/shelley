@@ -1,33 +1,24 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
 Backbone = require "backbone"
-_        = require "underscore"
 
-Shell    = require "./Shell"
 attrx = require "../attrx"
 
-#-------------------------------------------------------------------------------
-module.exports = class Workspace extends Backbone.Model
+Shell = require "./Shell"
 
-    #---------------------------------------------------------------------------
-    toString: -> "#{@constructor.name}#{JSON.stringify(@attributes)}"
+#-------------------------------------------------------------------------------
+module.exports = class Workspace extends require('backbone').Model
 
     #---------------------------------------------------------------------------
     attrx.declareAttributes @, 
         name:   type: String
         shells: type: [Shell]
-        
+
     #---------------------------------------------------------------------------
-    @create = (name) ->
-        coll         = new Backbone.Collection null, model: Workspace
-        coll.storage = new LocalStorage name: "shelley.ws.#{name}"
-        
+    open: (element) ->
+
     #---------------------------------------------------------------------------
-    @get = (name) ->
-        coll         = new Backbone.Collection null, model: Workspace
-        coll.storage = new LocalStorage name: "shelley.ws.#{name}"
-    
-    
+    close: ->
 
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller

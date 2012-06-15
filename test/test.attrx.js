@@ -110,6 +110,10 @@
       o: {
         type: Object
       },
+      t: {
+        type: String,
+        transient: true
+      },
       ab: {
         type: [Boolean]
       },
@@ -165,6 +169,17 @@
         y: "s"
       };
     });
+    it("handles transient attributes", function() {
+      var attrs, ma2;
+      ma.b = true;
+      ma.t = "shouldn't be persisted";
+      attrs = ma.toJSON();
+      ma2 = new A(attrs, {
+        parse: true
+      });
+      expect(attrs.t).toEqual(null);
+      return expect(ma2.t).toEqual(null);
+    });
     it("handles parsing base types", function() {
       var attrs, d, ma2;
       d = new Date;
@@ -184,7 +199,7 @@
       return expect(ma2.o).toEqual(rando1);
     });
     it("handles parsing array types", function() {
-      var ab, ao, attrs, ma2;
+      var ab, ao, attrs, i, j, ma2, _i, _j, _k, _ref1, _ref2, _ref3, _results;
       ab = [true, false, true];
       ao = [rando1, rando2, rando1];
       ma.ab = ab;
@@ -197,8 +212,27 @@
       });
       expect(ma2.ab).toEqual(ab);
       expect(ma2.ao).toEqual(ao);
-      expect(ma2.aab).toEqual([ab]);
-      return expect(ma2.aao).toEqual([ao]);
+      expect(ma2.aab.length).toEqual([ab].length);
+      for (i = _i = 0, _ref1 = ma2.aab.length; 0 <= _ref1 ? _i < _ref1 : _i > _ref1; i = 0 <= _ref1 ? ++_i : --_i) {
+        expect(ma2.aab[i].length).toEqual([ab][i].length);
+        for (j = _j = 0, _ref2 = ma2.aab[i].length; 0 <= _ref2 ? _j <= _ref2 : _j >= _ref2; j = 0 <= _ref2 ? ++_j : --_j) {
+          expect(ma2.aab[i][j]).toEqual([ab][i][j]);
+        }
+      }
+      expect(ma2.aao.length).toEqual([ao].length);
+      _results = [];
+      for (i = _k = 0, _ref3 = ma2.aao.length; 0 <= _ref3 ? _k < _ref3 : _k > _ref3; i = 0 <= _ref3 ? ++_k : --_k) {
+        expect(ma2.aao[i].length).toEqual([ao][i].length);
+        _results.push((function() {
+          var _l, _ref4, _results1;
+          _results1 = [];
+          for (j = _l = 0, _ref4 = ma2.aao[i].length; 0 <= _ref4 ? _l <= _ref4 : _l >= _ref4; j = 0 <= _ref4 ? ++_l : --_l) {
+            _results1.push(expect(ma2.aao[i][j]).toEqual([ao][i][j]));
+          }
+          return _results1;
+        })());
+      }
+      return _results;
     });
     it("handles parsing scalar model types", function() {
       var attrs, ma2;

@@ -1,17 +1,32 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
+Backbone = require "backbone"
+
+attrx     = require "../attrx"
+Workspace = require "./Workspace"
+
 #-------------------------------------------------------------------------------
 module.exports = class Workspace extends require('backbone').Model
 
     #---------------------------------------------------------------------------
-    initialize: (attrs) ->
-        @name = attrs.name
+    attrx.declareAttributes @, 
+        workspaceNames:  type: [String]
+        workspaces:     {type: [Workspace], transient: true}
+        
+    #---------------------------------------------------------------------------
+    loadWorkspace: (name) ->
+        ws = new Workspace 
+            name: name
+            shells: []
+            
+        ws.sync = Storage.sync "shelley.ws.#{name}"
+        
+        ws.fetch success: ->
+            @trigger "ready", ws
 
     #---------------------------------------------------------------------------
-    open: ->
-
-    #---------------------------------------------------------------------------
-    close: ->
+    open: (element) ->
+        
 
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller

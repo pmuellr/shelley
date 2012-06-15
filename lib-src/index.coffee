@@ -2,11 +2,53 @@
 
 Backbone = require "backbone"
 
-attrx                 = require "./attrx"
-ModelLocalStorageSync = require "./persist/ModelLocalStorageSync"
+attrx   = require "./attrx"
+Storage = require "./persist/ModelLocalStorageSync"
+
+Workspace        = require "./models/Workspace"
+WorkspaceManager = require "./models/WorkspaceManager"
+Shell            = require "./models/Shell"
 
 #-------------------------------------------------------------------------------
-shelley = module.exports    
+shelley = module.exports
+
+#-------------------------------------------------------------------------------
+main = ->
+    wm = shelley.wm = new WorkspaceManager()
+    wm.sync = Storage.sync "shelley.wm"
+    
+    wmFetchedCB = (model, attrs) -> 
+        if !wm.workspaceNames
+            wm.workspaceNames = []
+            wm.save()
+            
+        wm.trigger "ready", wm
+    
+    wm.fetch 
+        success: wmFetchedCB
+
+#-------------------------------------------------------------------------------
+setUpDefaultWorkspace = ->
+    name = "default"
+    workspace = new Workspace
+        name: name
+        shells: []
+        
+    workspace.sync = Storage.sync "shelley.ws.#{name}"
+    workspace.save()
+    
+    wm.lastWorkspaceName = name
+    wm.save()
+    
+    wm.workspaceNames = [name]
+    wm.workspaces = new Workspace
+        name:   name
+        shells: []
+    wm.workspaces
+
+
+#-------------------------------------------------------------------------------
+main()
 
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller

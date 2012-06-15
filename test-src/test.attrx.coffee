@@ -34,6 +34,7 @@ class A extends Backbone.Model
         s:    type: String
         d:    type: Date
         o:    type: Object
+        t:    { type: String, transient: true }
         ab:   type: [Boolean]
         ao:   type: [Object]
         aab:  type: [[Boolean]]
@@ -66,6 +67,17 @@ describe "attrx", ->
         rando2 = 
             x: 2 
             y: "s"
+
+    #---------------------------------------------------------------------------
+    it "handles transient attributes", () ->
+        ma.b = true
+        ma.t = "shouldn't be persisted"
+
+        attrs = ma.toJSON()
+        ma2 = new A(attrs, parse: true)
+        
+        expect(attrs.t).toEqual(null)
+        expect(ma2.t).toEqual(null)
 
     #---------------------------------------------------------------------------
     it "handles parsing base types", () ->
@@ -101,8 +113,23 @@ describe "attrx", ->
         
         expect(ma2.ab).toEqual(ab)
         expect(ma2.ao).toEqual(ao)
-        expect(ma2.aab).toEqual([ab])
-        expect(ma2.aao).toEqual([ao])
+
+# jasmine doesn't like the following, so unrolling        
+#        expect(ma2.aab).toEqual([ab])
+        expect(ma2.aab.length).toEqual([ab].length)
+        for i in [0...ma2.aab.length]
+            expect(ma2.aab[i].length).toEqual([ab][i].length)
+            for j in [0..ma2.aab[i].length]
+                expect(ma2.aab[i][j]).toEqual([ab][i][j])
+            
+# jasmine doesn't like the following, so unrolling        
+#        expect(ma2.aao).toEqual([ao])
+        expect(ma2.aao.length).toEqual([ao].length)
+        for i in [0...ma2.aao.length]
+            expect(ma2.aao[i].length).toEqual([ao][i].length)
+            for j in [0..ma2.aao[i].length]
+                expect(ma2.aao[i][j]).toEqual([ao][i][j])
+        
 
     #---------------------------------------------------------------------------
     it "handles parsing scalar model types", () ->

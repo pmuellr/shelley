@@ -1,7 +1,7 @@
 # Licensed under the Tumbolia Public License. See footer for details.
 
-tmp
 node_modules
+tmp
 vendor
 
 #-------------------------------------------------------------------------------
