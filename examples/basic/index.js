@@ -1,0 +1,3 @@
+$(function() {
+    $( "#shell-sample" ).dialog()
+})
